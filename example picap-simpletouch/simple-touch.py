@@ -52,17 +52,22 @@ release_threshold = 20
 sensor.set_touch_threshold(touch_threshold)
 sensor.set_release_threshold(release_threshold)
 
-
+states = [0] * 5
 running = True
 while running:
   try:
     if sensor.touch_status_changed():
       sensor.update_touch_data()
-      for i in range(12):
+      for i in range(0, 5):
         if sensor.is_new_touch(i):
-          print ("electrode {0} was just touched".format(i))
+          states[i] = 1
+          # print ("electrode {0} was just touched".format(i))
         elif sensor.is_new_release(i):
-          print ("electrode {0} was just released".format(i))
+          states[i] = 0
+          # print ("electrode {0} was just released".format(i))
+      for i in range(1, len(states)):
+        if states[0] and states[i]:
+          print("finger {0}".format(i))
     sleep(0.01)
   except KeyboardInterrupt:
     running = False
