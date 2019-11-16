@@ -37,11 +37,14 @@ while running:
         elif sensor.is_new_release(i):
           states[i] = 0
           # print ("electrode {0} was just released".format(i))
+      print(states)
+      count = 0
       for i in range(1, len(states)):
         if states[0] and states[i]:
           output = b'%d' %i
           ser.write(output)
-          print("finger {0}".format(i))
+          count += 1
+          print("finger {0}".format(i), states, count)
     
     sleep(0.01)
   except KeyboardInterrupt:
