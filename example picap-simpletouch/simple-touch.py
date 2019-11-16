@@ -37,10 +37,10 @@ from time import sleep
 import MPR121
 
 try:
-  sensor = MPR121.begin()
+    sensor = MPR121.begin()
 except Exception as e:
-  print (e)
-  sys.exit(1)
+    print(e)
+    sys.exit(1)
 
 # this is the touch threshold - setting it low makes it more like a proximity trigger default value is 40 for touch
 touch_threshold = 40
@@ -55,15 +55,14 @@ sensor.set_release_threshold(release_threshold)
 
 running = True
 while running:
-  try:
-    if sensor.touch_status_changed():
-      sensor.update_touch_data()
-      for i in range(12):
-        if sensor.is_new_touch(i):
-          print ("electrode {0} was just touched".format(i))
-        elif sensor.is_new_release(i):
-          print ("electrode {0} was just released".format(i))
-    sleep(0.01)
-  except KeyboardInterrupt:
-    running = False
-  
+    try:
+        if sensor.touch_status_changed():
+            sensor.update_touch_data()
+            for i in range(12):
+                if sensor.is_new_touch(i):
+                    print("electrode {0} was just touched".format(i))
+                elif sensor.is_new_release(i):
+                    print("electrode {0} was just released".format(i))
+        sleep(0.01)
+    except KeyboardInterrupt:
+        running = False
