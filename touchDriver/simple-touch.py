@@ -25,6 +25,7 @@ ser = serial.Serial('/dev/ttyACM0', 9600)
 
 # loop
 states = [0] * 5
+previous = [0] * 5
 running = True
 while running:
   try:
@@ -36,14 +37,26 @@ while running:
           # print ("electrode {0} was just touched".format(i))
         elif sensor.is_new_release(i):
           states[i] = 0
+          '''
+          for j in previous:
+            if i == 0:
+              output = b'%d' %(i+10)
+              #ser.write(output)
+            elif j == i:
+              output = b'%d' %(j+10)
+              ser.write(output)
+          '''
+            
           # print ("electrode {0} was just released".format(i))
       print(states)
       count = 0
+      previous = []
       for i in range(1, len(states)):
         if states[0] and states[i]:
           output = b'%d' %i
           ser.write(output)
           count += 1
+          previous.append(i)
           print("finger {0}".format(i), states, count)
     
     sleep(0.01)
