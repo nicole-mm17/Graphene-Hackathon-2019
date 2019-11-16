@@ -34,14 +34,18 @@
 #################################################################################
 
 from time import sleep
-import signal, sys, getopt, liblo, MPR121
+import signal
+import sys
+import getopt
+import liblo
+import MPR121
 import argparse
 
 try:
-  sensor = MPR121.begin()
+    sensor = MPR121.begin()
 except Exception as e:
-  print (e)
-  sys.exit(1)
+    print(e)
+    sys.exit(1)
 
 # how many electrodes we have
 electrodes_range = range(12)
@@ -57,21 +61,27 @@ sensor.set_touch_threshold(touch_threshold)
 sensor.set_release_threshold(release_threshold)
 
 # handle ctrl+c gracefully
+
+
 def signal_handler(signal, frame):
-  sys.exit(0)
+    sys.exit(0)
+
 
 signal.signal(signal.SIGINT, signal_handler)
 
-def setupargs():  
-  parser = argparse.ArgumentParser(description="Sends Pi Cap readings through OSC - MUST be run as root.",add_help=False)
-  parser.add_argument('-h','--host', nargs='?', metavar='CMD', dest = 'host', type=str, default='127.0.0.1', 
-                      help='host address, defaults to 127.0.0.1')
-  parser.add_argument('-p','--port', nargs='?', metavar='CMD', dest = 'port', type=int, default=3000, 
-                      help='port on which to send, defaults to 3000')
-  parser.add_argument('--help', action='help', default=argparse.SUPPRESS, help=argparse._('show this help message and exit'))
-                      
-  
-  return parser.parse_args()
+
+def setupargs():
+    parser = argparse.ArgumentParser(
+        description="Sends Pi Cap readings through OSC - MUST be run as root.", add_help=False)
+    parser.add_argument('-h', '--host', nargs='?', metavar='CMD', dest='host', type=str, default='127.0.0.1',
+                        help='host address, defaults to 127.0.0.1')
+    parser.add_argument('-p', '--port', nargs='?', metavar='CMD', dest='port', type=int, default=3000,
+                        help='port on which to send, defaults to 3000')
+    parser.add_argument('--help', action='help', default=argparse.SUPPRESS,
+                        help=argparse._('show this help message and exit'))
+
+    return parser.parse_args()
+
 
 args = setupargs()
 
@@ -79,56 +89,56 @@ args = setupargs()
 address = liblo.Address(args.host, args.port)
 
 while True:
-  bundle = liblo.Bundle()
+    bundle = liblo.Bundle()
 
-  if sensor.touch_status_changed():
-    sensor.update_touch_data()
+    if sensor.touch_status_changed():
+        sensor.update_touch_data()
 
-  sensor.update_baseline_data()
-  sensor.update_filtered_data()
+    sensor.update_baseline_data()
+    sensor.update_filtered_data()
 
-  # touch values
-  touch = liblo.Message("/touch")
-  data_array = []
-  for i in electrodes_range:
-    # get_touch_data returns boolean values: True or False
-    # we need to turn them into ints first: 1 or 0
-    # and then into string: "1" or "0" so we can display them
-    touch.add(int(sensor.get_touch_data(i)))
-  bundle.add(touch)
+    # touch values
+    touch = liblo.Message("/touch")
+    data_array = []
+    for i in electrodes_range:
+        # get_touch_data returns boolean values: True or False
+        # we need to turn them into ints first: 1 or 0
+        # and then into string: "1" or "0" so we can display them
+        touch.add(int(sensor.get_touch_data(i)))
+    bundle.add(touch)
 
-  # touch thresholds
-  tths = liblo.Message("/tths")
-  for i in electrodes_range:
-    tths.add(touch_threshold)
-  bundle.add(tths)
+    # touch thresholds
+    tths = liblo.Message("/tths")
+    for i in electrodes_range:
+        tths.add(touch_threshold)
+    bundle.add(tths)
 
-  # release threshold
-  rths = liblo.Message("/rths")
-  for i in electrodes_range:
-    rths.add(release_threshold)
-  bundle.add(rths)
+    # release threshold
+    rths = liblo.Message("/rths")
+    for i in electrodes_range:
+        rths.add(release_threshold)
+    bundle.add(rths)
 
-  # filtered values
-  fdat = liblo.Message("/fdat")
-  for i in electrodes_range:
-    fdat.add(sensor.get_filtered_data(i))
-  bundle.add(fdat)
+    # filtered values
+    fdat = liblo.Message("/fdat")
+    for i in electrodes_range:
+        fdat.add(sensor.get_filtered_data(i))
+    bundle.add(fdat)
 
-  # baseline values
-  bval = liblo.Message("/bval")
-  for i in electrodes_range:
-    bval.add(sensor.get_baseline_data(i))
-  bundle.add(bval)
+    # baseline values
+    bval = liblo.Message("/bval")
+    for i in electrodes_range:
+        bval.add(sensor.get_baseline_data(i))
+    bundle.add(bval)
 
-  # value pairs
-  diff = liblo.Message("/diff")
-  for i in electrodes_range:
-    diff.add(sensor.get_baseline_data(i) - sensor.get_filtered_data(i))
-  bundle.add(diff)
+    # value pairs
+    diff = liblo.Message("/diff")
+    for i in electrodes_range:
+        diff.add(sensor.get_baseline_data(i) - sensor.get_filtered_data(i))
+    bundle.add(diff)
 
-  # send our bundle to given address
-  liblo.send(address, bundle)
+    # send our bundle to given address
+    liblo.send(address, bundle)
 
-  # a little delay so that we don't just sit chewing CPU cycles
-  sleep(0.01)
+    # a little delay so that we don't just sit chewing CPU cycles
+    sleep(0.01)
