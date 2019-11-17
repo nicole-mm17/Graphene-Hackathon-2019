@@ -13,17 +13,19 @@ except Exception as e:
   sys.exit(1)
 
 # this is the touch threshold - setting it low makes it more like a proximity trigger default value is 40 for touch
-touch_threshold = 40
+touch_threshold = 20
 
 # this is the release threshold - must ALWAYS be smaller than the touch threshold default value is 20 for touch
-release_threshold = 20
+release_threshold = 10
 
 # set the thresholds
 sensor.set_touch_threshold(touch_threshold)
 sensor.set_release_threshold(release_threshold)
 
-# serial information
-#ser = serial.Serial('/dev/ttyACM0', 9600)
+#serial information
+ser = serial.Serial('/dev/ttyACM0', 9600)
+
+p = vlc.MediaPlayer('/home/pi/Documents/grapheneHackathon/touchDriver/mp3/Car Horn Honk 1-SoundBible.com-248048021.wav')
 
 # loop
 states = [0] * 5
@@ -50,24 +52,29 @@ while running:
           '''
           # print ("electrode {0} was just released".format(i))
       print(states)
-      count = 0
+      #count = 0
+      #for i in range(1,len(states)):
+        #if states[0] and states[i]:
+          #ser.write(str(i))
+          #print("finger {0}".format(i))
       
-      print("prev: {}".format(previous))
+      
+  #    print("prev: {}".format(previous))
       for i in range(1, len(states)):
         if states[0] and states[i]:
           if states[i] != previous[i] or states[0] != previous[0]:
-            output = b'%d' %i
-            #ser.write(output)
-            count += 1
-            print("finger {0}".format(i), states, count)
+            #output = b'%d' %i
+            ser.write(str(i))
+            #count += 1
+            print("finger {0}".format(i), states)
             if i == 2 or i == 0:
               if states[2] == 1:
                 print('BOOP')
-                p = vlc.MediaPlayer('/home/pi/Documents/grapheneHackathon/touchDriver/mp3/Car Horn Honk 1-SoundBible.com-248048021.wav')
                 p.play()
       previous=copy.deepcopy(states)
     
     sleep(0.01)
   except KeyboardInterrupt:
+    ser.close()
     running = False
   
