@@ -12,6 +12,9 @@ We designed and created a cycling jacket with LED indicators, a horn and proximi
 ### The wireless glove with printed graphene tracks:
 ![Glove](https://github.com/nicole-mm17/Graphene-Hackathon-2019/blob/master/Glove.jpeg)
 
+### Prototype of the cycling jacket and glove under construction:
+![Demo](https://github.com/nicole-mm17/Graphene-Hackathon-2019/blob/master/Demo.jpeg)
+
 ### Our brilliant team - Terry's CARBON Orange:
 ![Team Pyramid](https://github.com/nicole-mm17/Graphene-Hackathon-2019/blob/master/Team%20Pyramid.jpeg)
 
